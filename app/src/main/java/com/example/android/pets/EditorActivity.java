@@ -32,7 +32,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import data.PetContract.PetEntry;
-import data.PetDbHelper;
 
 import static android.R.attr.data;
 
@@ -61,9 +60,8 @@ public class EditorActivity extends AppCompatActivity {
      */
     private Spinner mGenderSpinner;
 
-    private PetDbHelper mPetDbHelper;
     /**
-     * Gender of the pet. The possible values are:
+    * Gender of the pet. The possible values are:
      * 0 for unknown gender, 1 for male, 2 for female.
      */
     private int mGender = 0;
@@ -78,8 +76,7 @@ public class EditorActivity extends AppCompatActivity {
         mBreedEditText = (EditText) findViewById(R.id.edit_pet_breed);
         mWeightEditText = (EditText) findViewById(R.id.edit_pet_weight);
         mGenderSpinner = (Spinner) findViewById(R.id.spinner_gender);
-
-        mPetDbHelper = new PetDbHelper(this);
+        
         setupSpinner();
     }
 
@@ -94,7 +91,7 @@ public class EditorActivity extends AppCompatActivity {
 
         // Specify dropdown layout style - simple list view with 1 item per line
         genderSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-
+        
         // Apply the adapter to the spinner
         mGenderSpinner.setAdapter(genderSpinnerAdapter);
 
@@ -131,7 +128,6 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     private void insertPet() {
-        SQLiteDatabase db = mPetDbHelper.getWritableDatabase();
 
         String nameString = mNameEditText.getText().toString().trim();
         String breedString = mBreedEditText.getText().toString().trim();
@@ -144,10 +140,17 @@ public class EditorActivity extends AppCompatActivity {
         values.put(PetEntry.COLUMN_PET_GENDER, gender);
         values.put(PetEntry.COLUMN_PET_WEIGHT, weight);
 
-        long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
+         Uri newUri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
 
-        Toast toast = new Toast(this);
-        toast.makeText(this, "Added Id: " + newRowId, Toast.LENGTH_LONG).show();
+        if (newUri == null) {
+        // If the new content URI is null, then there was an error with insertion.
+        Toast.makeText(this, getString(R.string.editor_insert_pet_failed),
+                Toast.LENGTH_SHORT).show();
+    } else {
+        // Otherwise, the insertion was successful and we can display a toast.
+        Toast.makeText(this, getString(R.string.editor_insert_pet_successful),
+                Toast.LENGTH_SHORT).show();
+    }
     }
 
     @Override
