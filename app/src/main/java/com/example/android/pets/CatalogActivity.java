@@ -28,15 +28,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import data.PetDbHelper;
 import data.PetContract.PetEntry;
 
 /**
  * Displays list of pets that were entered and stored in the app.
  */
 public class CatalogActivity extends AppCompatActivity {
-
-    private  PetDbHelper mDBHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +49,7 @@ public class CatalogActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        mDBHelper = new PetDbHelper(this);
+        
         displayDatabaseInfo();
     }
 
@@ -111,16 +107,14 @@ public class CatalogActivity extends AppCompatActivity {
     }
 
     private void insertPet(){
-        SQLiteDatabase db = mDBHelper.getWritableDatabase();
-
+       
         ContentValues values = new ContentValues();
         values.put(PetEntry.COLUMN_PET_NAME, "Toto");
         values.put(PetEntry.COLUMN_PET_BREED, "Terrier");
         values.put(PetEntry.COLUMN_PET_GENDER, PetEntry.GENDER_MALE);
         values.put(PetEntry.COLUMN_PET_WEIGHT, 7);
 
-        long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
-        Log.v("CatalogActivity", "New row ID" + newRowId);
+        Uri newUri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
     }
 
     @Override
