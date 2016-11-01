@@ -58,12 +58,19 @@ public class PetProvider extends ContentProvider{
         return cursor;
     }
 
-    @Nullable
-    @Override
-    public String getType(Uri uri) {
-        return null;
-    }
-
+     @Override
+      public String getType(Uri uri) {
+          final int match = sUriMatcher.match(uri);
+          switch (match) {
+              case PETS:
+                  return PetEntry.CONTENT_LIST_TYPE;
+              case PET_ID:
+                  return PetEntry.CONTENT_ITEM_TYPE;
+              default:
+                  throw new IllegalStateException("Unknown URI " + uri + " with match " + match);
+          }
+      }
+    
     @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues contentValues) {
