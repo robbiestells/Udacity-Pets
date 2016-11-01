@@ -77,6 +77,22 @@ public class PetProvider extends ContentProvider{
     }
 
     private Uri insertPet(Uri uri, ContentValues contentValues){
+        //Check that name is not null
+        String name = contentValues.getAsString(PetContract.PetEntry.COLUMN_PET_NAME);
+        if (name == null){
+            throw new IllegalArgumentException("Pet requires a name")
+        }
+
+        Integer gender = contentValues.getAsInteger(PetContract.PetEntry.COLUMN_PET_GENDER);
+        if (gender == null || !PetContract.PetEntry.isValidGender(gender)){
+            throw new IllegalArgumentException("Pet requires a gender selection")
+        }
+
+        Integer weight = contentValues.getAsInteger(PetContract.PetEntry.COLUMN_PET_WEIGHT);
+        if (weight != null && weight < 0){
+            throw new IllegalArgumentException("Pet requires a valid weight")
+        }
+
         SQLiteDatabase database = mHelper.getWritableDatabase();
 
         long id = database.insert(PetContract.PetEntry.TABLE_NAME, null, contentValues);
@@ -88,7 +104,7 @@ public class PetProvider extends ContentProvider{
 
         return  ContentUris.withAppendedId(uri, id);
     }
-
+    
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         return 0;
