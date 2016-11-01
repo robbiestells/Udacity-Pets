@@ -37,7 +37,24 @@ public class PetProvider extends ContentProvider{
     @Nullable
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return null;
+        SQLiteDatabase database = mHelper.getReadableDatabase();
+
+        Cursor cursor;
+
+        int match = sUriMatcher.match(uri);
+        switch (match) {
+            case PETS:
+                cursor = database.query(PetContract.PetEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            case PETS_ID:
+                selection = PetContract.PetEntry.I_D + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                cursor = database.query(PetContract.PetEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            default:
+                throw new IllegalArgumentException("Cannot query unknown URI " + uri);
+        }
+        return cursor;
     }
 
     @Nullable
