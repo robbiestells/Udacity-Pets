@@ -52,7 +52,7 @@ public class PetCursorAdapter extends CursorAdapter {
      */
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        // TODO: Fill out this method
+
         TextView tvName = (TextView) view.findViewById(R.id.name);
         TextView tvBreed = (TextView) view.findViewById(R.id.summary);
 
