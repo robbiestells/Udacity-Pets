@@ -34,6 +34,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import data.PetContract.PetEntry;
 import data.PetCursorAdapter;
@@ -67,11 +68,9 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         petListView.setEmptyView(emptyView);
 
         //set up item click listener
-
-        //NEED TO FIX THIS TOP LINE
-        petListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        petListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id){
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Intent intent = new Intent(CatalogActivity.this, EditorActivity.class);
 
                 Uri currentPetUri = ContentUris.withAppendedId(PetEntry.CONTENT_URI, id);
@@ -119,11 +118,23 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 return true;
             // Respond to a click on the "Delete all entries" menu option
             case R.id.action_delete_all_entries:
-                // Do nothing for now
+                deleteAllPets();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void deleteAllPets() {
+
+        int rowsDeleted = getContentResolver().delete(PetEntry.CONTENT_URI, null, null);
+
+        if (rowsDeleted == 0) {
+            Toast.makeText(this, getString(R.string.editor_delete_pet_failed), Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, getString(R.string.editor_delete_pet_successful), Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -133,17 +144,17 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 PetEntry.COLUMN_PET_BREED,
         };
         return new CursorLoader(
-                        this,   // Parent activity context
-                        PetEntry.CONTENT_URI,        // Table to query
-                        projection,     // Projection to return
-                        null,            // No selection clause
-                        null,            // No selection arguments
-                        null             // Default sort order
+                this,   // Parent activity context
+                PetEntry.CONTENT_URI,        // Table to query
+                projection,     // Projection to return
+                null,            // No selection clause
+                null,            // No selection arguments
+                null             // Default sort order
         );
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data){
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mCursorAdapter.swapCursor(data);
     }
 
